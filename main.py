@@ -216,7 +216,7 @@ class WeaviateClient(JINA):
 
             data_objs = [
                 {
-                    "content": str(chunk),
+                    "content": f"FILENAME: {file_name}\n" + str(chunk),
                     "uuid": str(uuid_),
                     "file_name": str(file_name)
                 } for chunk in batch
