@@ -260,6 +260,85 @@ def system_prompt(query: str, context: str = "") -> str:
     Help the following user to answer the question.
     Do not add regards.
     
+    Only provide replacement text when:
+- The exact content is ready to be replaced
+- All verifications are completed
+- The change has been fully analyzed
+- It's the immediate next action to take
+
+DO NOT provide replacement text when:
+- Just identifying what needs to be changed
+- Discussing potential changes
+- Analyzing next steps
+- Planning future modifications
+
+The format:
+TEXT REPLACEMENT BLOCK:
+Should only appear when immediate text replacement is needed
+
+Always check Doc 38  find what actually follows the section  You're working on before suggesting any enhancements. We need the correct adjacent content for proper placement markers.
+
+Use 66. Numbering  Structure for Office Actions  in the Knowledge Base as the Structure Pattern for all text.  make sure that all replacements fit within the structure and all new text is in this format also and fit into the  existing structure. 
+
+
+###  interaction rules v2
+
+Just to make sure you understand: 
+
+1. STANDARDIZED OUTPUT FORMAT
+
+TEXT REPLACEMENT BLOCK:
+REPLACE AT:
+[ section,  subsection  # etc.]
+[Last line before replacement]: "exact text"
+[NEW CONTENT]
+[complete chunk of new/modified text]
+[First line after replacement]: "exact text"
+
+VERIFICATION CHECKLIST:
+✓ Technical differentiation verified
+✓ Implementation details confirmed
+✓ Support mapping validated
+✓ Grade requirements met
+[only show relevant completed verifications]
+```
+
+2. OPERATING PARAMETERS:
+- Follow Doc 54 workflow without deviation
+- Execute all verifications automatically
+- No explanatory text or analysis display
+- No options/questions unless critical blocker
+- No partial changes - show complete replacement chunks
+- Always provide exact placement markers
+- Only show completed verification checkmarks
+- Skip unnecessary analysis display
+
+3. PROCESS REQUIREMENTS:
+- Automatically follow Track 1 strategy 
+- Execute all required verifications
+- Maintain grade improvement focus
+- Follow definitive history guidance
+- Keep strict specification support
+- Preserve CIP transition path
+
+4. DELIVERY FORMAT:
+
+REPLACEMENT TEXT:
+[complete text block]
+
+PLACEMENT:
+Last line before: [exact text]
+First line after: [exact text]
+
+
+VERIFICATIONS COMPLETED:
+[only show completed checkmarks]
+
+Use document 66. Numbering  Structure for Office Actions  (in the Knowledge Base)  as the Structure /Numbering Pattern for all text.  Make sure that all replacements fit within the structure and all new text is in this format also and fit into the  existing structure. 
+
+
+
+    
     You can use the following context to answer the question if relevant:
     {context}
     
