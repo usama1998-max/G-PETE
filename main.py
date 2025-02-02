@@ -253,8 +253,7 @@ class WeaviateClient(JINA):
             return False
 
 
-def system_prompt(query: str, context: str = "") -> str:
-    return f"""Your name is G-PETE, You work as an attorney. 
+defualt_prompt = """Your name is G-PETE, You work as an attorney. 
     You are not an AI but a human. 
     Your response should be friendly and helpful. 
     Help the following user to answer the question.
@@ -335,9 +334,14 @@ VERIFICATIONS COMPLETED:
 [only show completed checkmarks]
 
 Use document 66. Numbering  Structure for Office Actions  (in the Knowledge Base)  as the Structure /Numbering Pattern for all text.  Make sure that all replacements fit within the structure and all new text is in this format also and fit into the  existing structure. 
+"""
+
+new_prompt = st.text_area(label="🤖 G-PETE: You can modify my behavior", value=defualt_prompt, height=700)
 
 
-
+def system_prompt(query: str, context: str = "") -> str:
+    return f"""
+    {new_prompt}
     
     You can use the following context to answer the question if relevant:
     {context}
@@ -381,37 +385,37 @@ uploaded_file = st.sidebar.file_uploader("Upload a file", type=["txt"], key="upl
 # st.error("❌ An error occurred.")
 # st.info("ℹ️ This is an informational message.")
 
-
+content = ""
 if uploaded_file is not None:
     if uploaded_file.type == "text/plain":
         content = uploaded_file.read().decode("utf-8")
 
-        docs = knowledge_base.chunk_document(content)
+        # docs = knowledge_base.chunk_document(content)
 
-        unique_id = str(uuid.uuid4())
-        knowledge_base.add_batch_uuid(KNOWLEDGE_BASE_NAME, docs, unique_id, uploaded_file.name)
+        # unique_id = str(uuid.uuid4())
+        # knowledge_base.add_batch_uuid(KNOWLEDGE_BASE_NAME, docs, unique_id, uploaded_file.name)
 
         st.sidebar.success(f"🤖 G-PETE: I learned everything from {uploaded_file.name} ✅")
         st.session_state.uploaded_file = None
 
 
-files = knowledge_base.get_files(KNOWLEDGE_BASE_NAME)
+# files = knowledge_base.get_files(KNOWLEDGE_BASE_NAME)
 
 
-for i, file_obj in enumerate(files):
-    if "file_name" in file_obj:
-        col1, col2 = st.sidebar.columns([3, 1])
-
-        with col1:
-            st.sidebar.markdown(
-                f"""<div style="border: 2px solid white; padding: 10px; margin-top:5px; border-radius:10px;"> {file_obj['file_name']} </div>""",
-                unsafe_allow_html=True
-            )
-
-        with col2:
-            if st.sidebar.button("Remove", key=f"process_{i}"):  # Unique key
-               knowledge_base.remove_uuid(KNOWLEDGE_BASE_NAME, file_obj['uuid'])
-               files = knowledge_base.get_files(KNOWLEDGE_BASE_NAME)
+# for i, file_obj in enumerate(files):
+#     if "file_name" in file_obj:
+#         col1, col2 = st.sidebar.columns([3, 1])
+#
+#         with col1:
+#             st.sidebar.markdown(
+#                 f"""<div style="border: 2px solid white; padding: 10px; margin-top:5px; border-radius:10px;"> {file_obj['file_name']} </div>""",
+#                 unsafe_allow_html=True
+#             )
+#
+#         with col2:
+#             if st.sidebar.button("Remove", key=f"process_{i}"):  # Unique key
+#                knowledge_base.remove_uuid(KNOWLEDGE_BASE_NAME, file_obj['uuid'])
+#                files = knowledge_base.get_files(KNOWLEDGE_BASE_NAME)
 
 st.title("🤖 G-PETE")
 st.text("Hi there! I'm G-PETE, and I'm an attorney who's been practicing law for several years. I really enjoy helping people navigate their legal questions and concerns. I aim to provide clear, practical legal guidance while keeping things friendly and approachable - law can be complicated enough without making it more intimidating! Lets have a conversation shall we")
@@ -422,20 +426,20 @@ output = st.empty()
 
 
 if text:
-    vectors = knowledge_base.knowledge_retrieval(KNOWLEDGE_BASE_NAME, text)
-    knowledge = knowledge_base.knowledge_reranker(text, vectors, 10)
+    # vectors = knowledge_base.knowledge_retrieval(KNOWLEDGE_BASE_NAME, text)
+    # knowledge = knowledge_base.knowledge_reranker(text, vectors, 10)
 
     response = client.messages.create(
         model="claude-3-5-sonnet-20241022",
         max_tokens=1024,
-        messages=[{'role': 'user', 'content': system_prompt(query=text, context=knowledge_base.format_context(knowledge))}],
+        messages=[{'role': 'user', 'content': system_prompt(query=text, context=content)}], # knowledge_base.format_context(knowledge)
         stream=True
     )
-    st.markdown("### Found related Knowledge in the Document:")
-    st.write(vectors)
-
-    st.markdown("### I selected the following context related to question:")
-    st.write(knowledge)
+    # st.markdown("### Found related Knowledge in the Document:")
+    # st.write(vectors)
+    #
+    # st.markdown("### I selected the following context related to question:")
+    # st.write(knowledge)
     output.write_stream(stream_response(response))
     knowledge_base.weaviate_client.close()
 
