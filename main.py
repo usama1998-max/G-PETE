@@ -431,7 +431,8 @@ if text:
 
     response = client.messages.create(
         model="claude-3-5-sonnet-20241022",
-        max_tokens=1024,
+        max_tokens=2000,
+        temperature=0.4,
         messages=[{'role': 'user', 'content': system_prompt(query=text, context=content)}], # knowledge_base.format_context(knowledge)
         stream=True
     )
